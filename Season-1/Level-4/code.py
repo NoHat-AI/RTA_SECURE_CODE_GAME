@@ -102,8 +102,8 @@ class DB_CRUD_ops(object):
             # performs the checks for good cyber security and safe software against SQL injection
             if has_restricted_char or not correct_number_of_single_quotes:
                 # in case you want to sanitize user input, please uncomment the following 2 lines
-                 sanitized_query = query.translate({ord(char):None for char in restricted_chars})
-                 res += "[QUERY] " + sanitized_query + "\n"
+                 query = query.translate({ord(char):None for char in restricted_chars})
+                 res += "[QUERY] " + query + "\n"
                  res += "CONFIRM THAT THE ABOVE QUERY IS NOT MALICIOUS TO EXECUTE"
             else:
                 cur.execute(query)
