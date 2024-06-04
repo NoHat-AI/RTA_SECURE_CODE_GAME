@@ -195,7 +195,7 @@ class DB_CRUD_ops(object):
                 # in case you want to sanitize user input, please uncomment the following 2 lines
                 sanitized_price = price.translate({ord(char):None for char in restricted_chars}).split("'", 1)[0]     
 
-            if not isinstance(price, float):
+            if not isinstance(sanitized_price, float):
                 raise Exception("ERROR: stock price provided is not a float")
 
             res = "[METHOD EXECUTED] update_stock_price\n"
@@ -203,7 +203,7 @@ class DB_CRUD_ops(object):
             query = "UPDATE stocks SET price = '%d' WHERE symbol = '%s'" % (price, stock_symbol)
             res += "[QUERY] " + query + "\n"
 
-            cur.execute(query)
+            cur = db_con.execute(query, (sanitized_stock_symbol,price,))
             db_con.commit()
             query_outcome = cur.fetchall()
             for result in query_outcome:
