@@ -30,14 +30,15 @@ class TaxPayer:
 
     # returns the path of an optional profile picture that users can set
     def get_prof_picture(self, path=None):
+        # get path using safe function
         prof_picture_path = self.safe_path(path)
         # setting a profile picture is optional
         if not prof_picture_path:
             return None
 
         # defends against path traversal attacks
-        #if path.startswith('/') or path.startswith('..'):
-         #   return None
+        # if path.startswith('/') or path.startswith('..'):
+        #   return None
 
         with open(prof_picture_path, 'rb') as pic:
             picture = bytearray(pic.read())
@@ -48,12 +49,16 @@ class TaxPayer:
     # returns the path of an attached tax form that every user should submit
     def get_tax_form_attachment(self, path=None):
         tax_data = None
+        
+        tax_path = self.safe_path(path)
+        if not tax_data:
+            return None
 
-        if not path:
+        if not tax_path:
             raise Exception("Error: Tax form is required for all users")
 
-        with open(path, 'rb') as form:
+        with open(tax_path, 'rb') as form:
             tax_data = bytearray(form.read())
 
         # assume that tax data is returned on screen after this
-        return path
+        return tax_path
