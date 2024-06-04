@@ -49,11 +49,13 @@ class TaxPayer:
     # returns the path of an attached tax form that every user should submit
     def get_tax_form_attachment(self, path=None):
         tax_data = None
+
+        if not path:
+            raise Exception("Error: Tax form is required for all users")
         
         tax_path = self.safe_path(path)
-
         if not tax_path:
-            raise Exception("Error: Tax form is required for all users")
+            return None
 
         with open(tax_path, 'rb') as form:
             tax_data = bytearray(form.read())
