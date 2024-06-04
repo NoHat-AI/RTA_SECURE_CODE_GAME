@@ -130,19 +130,29 @@ class DB_CRUD_ops(object):
             path = os.path.dirname(os.path.abspath(__file__))
             db_path = os.path.join(path, 'level-4.db')
             db_con = con.create_connection(db_path)
-            cur = db_con.cursor()
+            
+            sanitized_stock_symbol = stock_symbol
+            # a block list (aka restricted characters) that should not exist in user-supplied input
+            restricted_chars = ";%&^!#-"
+            # checks if input contains characters from the block list
+            has_restricted_char = any([char in stock_symbol for char in restricted_chars])
+            # checks if input contains a wrong number of single quotes against SQL injection
+            correct_number_of_single_quotes = stock_symbol.count("'") == 2
+
+            # performs the checks for good cyber security and safe software against SQL injection
+            if has_restricted_char or not correct_number_of_single_quotes:
+                # in case you want to sanitize user input, please uncomment the following 2 lines
+                sanitized_stock_symbol = stock_symbol.translate({ord(char):None for char in restricted_chars}).split("'", 1)[0]
+
 
             res = "[METHOD EXECUTED] get_stock_price\n"
-            query = "SELECT price FROM stocks WHERE symbol = '" + stock_symbol + "'"
-            res += "[QUERY] " + query + "\n"
-            if ';' in query:
-                res += "[SCRIPT EXECUTION]\n"
-                cur.executescript(query)
-            else:
-                cur.execute(query)
-                query_outcome = cur.fetchall()
-                for result in query_outcome:
-                    res += "[RESULT] " + str(result) + "\n"
+            query = "SELECT price FROM stocks WHERE symbol = ?"
+            res += "[QUERY] " + query.replace("?", "'{}'".format(sanitized_stock_symbol))+ "\n"
+            cur = db_con.execute(query, (sanitized_stock_symbol,))
+
+            query_outcome = cur.fetchall()
+            for result in query_outcome:
+                res += "[RESULT] " + str(result) + "\n"
             return res
 
         except sqlite3.Error as e:
