@@ -51,8 +51,6 @@ class TaxPayer:
         tax_data = None
         
         tax_path = self.safe_path(path)
-        if not tax_data:
-            return None
 
         if not tax_path:
             raise Exception("Error: Tax form is required for all users")
