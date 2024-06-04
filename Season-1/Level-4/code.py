@@ -141,7 +141,7 @@ class DB_CRUD_ops(object):
 
             # performs the checks for good cyber security and safe software against SQL injection
             if has_restricted_char or not correct_number_of_single_quotes:
-                # in case you want to sanitize user input, please uncomment the following 2 lines
+                # in case you want to sanitize user input, please uncomment the following 1 lines
                 sanitized_stock_symbol = stock_symbol.translate({ord(char):None for char in restricted_chars}).split("'", 1)[0]
 
 
@@ -170,7 +170,30 @@ class DB_CRUD_ops(object):
             path = os.path.dirname(os.path.abspath(__file__))
             db_path = os.path.join(path, 'level-4.db')
             db_con = con.create_connection(db_path)
-            cur = db_con.cursor()
+
+            sanitized_stock_symbol = stock_symbol
+            # a block list (aka restricted characters) that should not exist in user-supplied input
+            restricted_chars = ";%&^!#-"
+            # checks if input contains characters from the block list
+            has_restricted_char = any([char in stock_symbol for char in restricted_chars])
+            # checks if input contains a wrong number of single quotes against SQL injection
+            correct_number_of_single_quotes = stock_symbol.count("'") == 2   
+            # performs the checks for good cyber security and safe software against SQL injection
+            if has_restricted_char or not correct_number_of_single_quotes:
+                # in case you want to sanitize user input, please uncomment the following 2 lines
+                sanitized_stock_symbol = stock_symbol.translate({ord(char):None for char in restricted_chars}).split("'", 1)[0]
+            
+            sanitized_price = price
+            # a block list (aka restricted characters) that should not exist in user-supplied input
+            restricted_chars = ";%&^!#-"
+            # checks if input contains characters from the block list
+            has_restricted_char = any([char in price for char in restricted_chars])
+            # checks if input contains a wrong number of single quotes against SQL injection
+            correct_number_of_single_quotes = price.count("'") == 2    
+            # performs the checks for good cyber security and safe software against SQL injection
+            if has_restricted_char or not correct_number_of_single_quotes:
+                # in case you want to sanitize user input, please uncomment the following 2 lines
+                sanitized_price = price.translate({ord(char):None for char in restricted_chars}).split("'", 1)[0]     
 
             if not isinstance(price, float):
                 raise Exception("ERROR: stock price provided is not a float")
