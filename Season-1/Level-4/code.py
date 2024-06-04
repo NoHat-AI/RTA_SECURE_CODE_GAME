@@ -75,23 +75,6 @@ class Create(object):
 
 class DB_CRUD_ops(object):
 
-    # sanatize input
-    def sanatize_query(self, input):
-                # a block list (aka restricted characters) that should not exist in user-supplied input
-                restricted_chars = ";%&^!#-"
-                # checks if input contains characters from the block list
-                has_restricted_char = any([char in input for char in restricted_chars])
-                # checks if input contains a wrong number of single quotes against SQL injection
-                correct_number_of_single_quotes = input.count("'") == 2
-
-                # performs the checks for good cyber security and safe software against SQL injection
-                if has_restricted_char or not correct_number_of_single_quotes:
-                    # in case you want to sanitize user input, please uncomment the following 2 lines
-                    sanitized_input = input.translate({ord(char):None for char in restricted_chars})
-                    res += "[SANITIZED_QUERY]" + sanitized_input + "\n"
-                else:
-                    return input
-
     # retrieves all info about a stock symbol from the stocks table
     # Example: get_stock_info('MSFT') will result into executing
     # SELECT * FROM stocks WHERE symbol = 'MSFT'
@@ -108,21 +91,22 @@ class DB_CRUD_ops(object):
             res = "[METHOD EXECUTED] get_stock_info\n"
             query = "SELECT * FROM stocks WHERE symbol = '{0}'".format(stock_symbol)
             res += "[QUERY] " + query + "\n"
-            # def sanatize_query(self, input):
-            #     # a block list (aka restricted characters) that should not exist in user-supplied input
-            #     restricted_chars = ";%&^!#-"
-            #     # checks if input contains characters from the block list
-            #     has_restricted_char = any([char in query for char in restricted_chars])
-            #     # checks if input contains a wrong number of single quotes against SQL injection
-            #     correct_number_of_single_quotes = query.count("'") == 2
 
-            #     # performs the checks for good cyber security and safe software against SQL injection
-            #     if has_restricted_char or not correct_number_of_single_quotes:
-            #         # in case you want to sanitize user input, please uncomment the following 2 lines
-            #         sanitized_query = query.translate({ord(char):None for char in restricted_chars})
-            #         res += "[SANITIZED_QUERY]" + sanitized_query + "\n"
-            #     else:
-            #         cur.execute(query)
+            # a block list (aka restricted characters) that should not exist in user-supplied input
+            restricted_chars = ";%&^!#-"
+            # checks if input contains characters from the block list
+            has_restricted_char = any([char in query for char in restricted_chars])
+            # checks if input contains a wrong number of single quotes against SQL injection
+            correct_number_of_single_quotes = query.count("'") == 2
+
+            # performs the checks for good cyber security and safe software against SQL injection
+            if has_restricted_char or not correct_number_of_single_quotes:
+                # in case you want to sanitize user input, please uncomment the following 2 lines
+                # sanitized_query = query.translate({ord(char):None for char in restricted_chars})
+                # res += "[SANITIZED_QUERY]" + sanitized_query + "\n"
+                res += "CONFIRM THAT THE ABOVE QUERY IS NOT MALICIOUS TO EXECUTE"
+            else:
+                cur.execute(query)
 
                 query_outcome = cur.fetchall()
                 for result in query_outcome:
@@ -149,8 +133,8 @@ class DB_CRUD_ops(object):
             cur = db_con.cursor()
 
             res = "[METHOD EXECUTED] get_stock_price\n"
-            query = "SELECT price FROM stocks WHERE symbol = ?"
-            res += "[QUERY] " + query.replace("?", "'{}'".format(sanitized_query)) + "\n"
+            query = "SELECT price FROM stocks WHERE symbol = '" + stock_symbol + "'"
+            res += "[QUERY] " + query + "\n"
             if ';' in query:
                 res += "[SCRIPT EXECUTION]\n"
                 cur.executescript(query)
