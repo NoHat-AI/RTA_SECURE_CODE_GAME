@@ -76,7 +76,7 @@ class Create(object):
 class DB_CRUD_ops(object):
 
     # sanatize input
-    def sanatize(self, input):
+    def sanatize_query(self, input):
                 # a block list (aka restricted characters) that should not exist in user-supplied input
                 restricted_chars = ";%&^!#-"
                 # checks if input contains characters from the block list
@@ -88,8 +88,9 @@ class DB_CRUD_ops(object):
                 if has_restricted_char or not correct_number_of_single_quotes:
                     # in case you want to sanitize user input, please uncomment the following 2 lines
                     sanitized_input = input.translate({ord(char):None for char in restricted_chars})
+                    res += "[SANITIZED_QUERY]" + sanitized_input + "\n"
                 else:
-                    sanitized_input = input
+                    return input
 
     # retrieves all info about a stock symbol from the stocks table
     # Example: get_stock_info('MSFT') will result into executing
@@ -98,7 +99,6 @@ class DB_CRUD_ops(object):
         # building database from scratch as it is more suitable for the purpose of the lab
         db = Create()
         con = Connect()
-        self.sanatize(stock_symbol)
         try:
             path = os.path.dirname(os.path.abspath(__file__))
             db_path = os.path.join(path, 'level-4.db')
@@ -106,7 +106,7 @@ class DB_CRUD_ops(object):
             cur = db_con.cursor()
 
             res = "[METHOD EXECUTED] get_stock_info\n"
-            query = "SELECT * FROM stocks WHERE symbol = ?)'{0}'".format(input)
+            query = "SELECT * FROM stocks WHERE symbol = '{0}'".format(stock_symbol)
             res += "[QUERY] " + query + "\n"
             # def sanatize_query(self, input):
             #     # a block list (aka restricted characters) that should not exist in user-supplied input
@@ -122,11 +122,11 @@ class DB_CRUD_ops(object):
             #         sanitized_query = query.translate({ord(char):None for char in restricted_chars})
             #         res += "[SANITIZED_QUERY]" + sanitized_query + "\n"
             #     else:
-            cur.execute(query)
+            #         cur.execute(query)
 
-            query_outcome = cur.fetchall()
-            for result in query_outcome:
-                res += "[RESULT] " + str(result)
+                query_outcome = cur.fetchall()
+                for result in query_outcome:
+                    res += "[RESULT] " + str(result)
             return res
 
         except sqlite3.Error as e:
@@ -142,7 +142,6 @@ class DB_CRUD_ops(object):
         # building database from scratch as it is more suitable for the purpose of the lab
         db = Create()
         con = Connect()
-        input = self.sanatize(stock_symbol)
         try:
             path = os.path.dirname(os.path.abspath(__file__))
             db_path = os.path.join(path, 'level-4.db')
@@ -151,7 +150,7 @@ class DB_CRUD_ops(object):
 
             res = "[METHOD EXECUTED] get_stock_price\n"
             query = "SELECT price FROM stocks WHERE symbol = ?"
-            res += "[QUERY] " + query.replace("?", "'{}'".format(input)) + "\n"
+            res += "[QUERY] " + query.replace("?", "'{}'".format(sanitized_query)) + "\n"
             if ';' in query:
                 res += "[SCRIPT EXECUTION]\n"
                 cur.executescript(query)
