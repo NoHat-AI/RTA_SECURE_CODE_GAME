@@ -52,7 +52,7 @@ class TaxPayer:
         if not path:
             raise Exception("Error: Tax form is required for all users")
         tax_path = self.safe_path(path)
-        with open(tax_path, 'rb') as form:
+        with open(path, 'rb') as form:
             tax_data = bytearray(form.read())
 
         # assume that tax data is returned on screen after this
