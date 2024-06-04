@@ -200,7 +200,7 @@ class DB_CRUD_ops(object):
 
             res = "[METHOD EXECUTED] update_stock_price\n"
             # UPDATE stocks SET price = 310.0 WHERE symbol = 'MSFT'
-            query = "UPDATE stocks SET price = '%d' WHERE symbol = '%s'" % (sanitized_price, sanitized_stock_symbol)
+            query = "UPDATE stocks SET price = ? WHERE symbol = ?" % (sanitized_price, sanitized_stock_symbol)
             res += "[QUERY] " + query + "\n"
 
             cur = db_con.execute(query, (price, sanitized_stock_symbol,))
