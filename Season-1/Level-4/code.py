@@ -103,7 +103,7 @@ class DB_CRUD_ops(object):
             if has_restricted_char or not correct_number_of_single_quotes:
                 # in case you want to sanitize user input, please uncomment the following 2 lines
                  sanitized_query = query.translate({ord(char):None for char in restricted_chars})
-                 res += "[SANITIZED_QUERY] " + sanitized_query + "\n"
+                 res += "[QUERY] " + sanitized_query + "\n"
                  res += "CONFIRM THAT THE ABOVE QUERY IS NOT MALICIOUS TO EXECUTE"
             else:
                 cur.execute(query)
